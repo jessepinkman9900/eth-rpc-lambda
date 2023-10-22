@@ -1,7 +1,7 @@
 import {ethers} from "ethers";
 import fetch from "node-fetch";
 
-export async function walletWatcher(): Promise<HttpResponse> {
+export async function ethRpcCall(): Promise<HttpResponse> {
   try {
     let RPC_URL = process.env.RPC_URL
 
