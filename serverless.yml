@@ -1,0 +1,39 @@
+service: eth-rpc-query-cronjob
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+  - serverless-plugin-typescript
+
+useDotenv: true
+
+provider:
+  name: aws
+  region: us-east-1
+  tags:
+    network: ${env:NETWORK}
+  architecture: x86_64
+  runtime: nodejs18.x
+  memorySize: 128
+  timeout: 5
+  tracing:
+    apiGateway: false
+    lambda: false
+  httpApi:
+    metrics: true
+    cors: true
+  logs:
+    httpApi:
+      format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
+
+functions:
+  wallet-watcher:
+    handler: src/handler.ethRpcCall
+    environment:
+      RPC_URL: ${env:RPC_URL}
+    events:
+      - schedule:
+          rate: rate(1 minute)
+      - httpApi:
+          method: POST
+          path: /
